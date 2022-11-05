@@ -1,0 +1,151 @@
+<%- include('./../parts/html-head') %>
+    <%- include('./../parts/navbar') %>
+        <div class="container">
+            <div class="row justify-content-end">
+                <div class="col-lg-4">
+                    <form class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                            name="search" value="<%= search %>">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                    <form>
+                        <div class="col">
+                            <select class="form-select mb-3" name="shop_city" id="selCity" onchange="newArea()">
+                                <option value="">請選擇縣市</option>
+                                <% for(let c of city_rows){ %>
+                                    <option value="<%= c.sid %>">
+                                        <%= c.shop_city %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select name="shop_area" id="selArea" class="form-select mb-3">
+                                <option value="">請選擇地區</option>
+                                <%# for(let a of area_rows){ %>
+                                    <!-- <option value="<%# a.sid %>">
+                                        <%# a.shop_area %>
+                                    </option> -->
+                                    <%# } %>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-info">搜尋</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item <%= 1===page ? 'disabled': '' %>">
+                                <a class="page-link"
+                                    href="?<%= new URLSearchParams({...query,page:page-1}).toString() %>">
+                                    <i class="fa-solid fa-circle-arrow-left"></i>
+                                </a>
+                            </li>
+                            <% for(let i=page-5; i<=page+5; i++) if(i>=1 && i<=totalPages){ %>
+                                    <li class="page-item <%= i===page ? 'active': '' %>">
+                                        <a class="page-link"
+                                            href="?<%= new URLSearchParams({...query,page:i}).toString() %>">
+                                            <%= i %>
+                                        </a>
+                                    </li>
+                                    <% } %>
+                                        <li class="page-item <%= totalPages===page ? 'disabled': '' %>">
+                                            <a class="page-link"
+                                                href="?<%= new URLSearchParams({...query,page:page+1}).toString() %>">
+                                                <i class="fa-solid fa-circle-arrow-right"></i>
+                                            </a>
+                                        </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <div class="row">
+                <% for(let r of rows){ %>
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="card">
+                            <img src="#" class="card-img-top">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <%= r.shop_name %>
+                                </h5>
+                                <div class="card-text">
+                                    <%= r.shop_phone %>
+                                </div>
+                                <div class="card-text">
+                                    <%= r.shop_city %>
+                                        <%= r.shop_area %>
+                                            <%= r.shop_address_detail %>
+                                </div>
+                                <div class="card-text">營業時間:<%= r.shop_opentime %>-
+                                        <%= r.shop_closetime %>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button type="button"
+                                        class="btn <%= r.shop_mon===1 ? 'btn-success': '' %>">一</button>
+                                    <button type="button"
+                                        class="btn <%= r.shop_tue===1 ? 'btn-success': '' %>">二</button>
+                                    <button type="button"
+                                        class="btn <%= r.shop_wed===1 ? 'btn-success': '' %>">三</button>
+                                    <button type="button"
+                                        class="btn <%= r.shop_thu===1 ? 'btn-success': '' %>">四</button>
+                                    <button type="button"
+                                        class="btn <%= r.shop_fri===1 ? 'btn-success': '' %>">五</button>
+                                    <button type="button"
+                                        class="btn <%= r.shop_sat===1 ? 'btn-success': '' %>">六</button>
+                                    <button type="button"
+                                        class="btn <%= r.shop_sun===1 ? 'btn-success': '' %>">日</button>
+                                </div>
+                                <a href="#" class="btn btn-primary">->去逛逛</a>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+        <%- include('./../parts/scripts') %>
+            <script>
+                /*function delItem(sid) {
+                    fetch('/ab/del/' + sid, {
+                        method: 'DELETE'
+                    }).then(r => r.json())
+                        .then(result => {
+                            console.log(JSON.stringify(result));
+                            location.reload();
+                        })
+                }*/
+
+                function newArea(city) {
+                    city = document.querySelector('#selCity').value;
+                    const area = document.querySelector('#selArea');
+                    area.options.length = 0;
+                    console.log(city);
+                    fetch('/main/card/city/' + city, {
+                        method: 'GET'
+                    }).then(r => r.json())
+                        .then(obj => {
+                            console.log(obj);
+                            // obj.forEach((value, index, array) => {
+                            //     let {
+                            //         sid,
+                            //         shop_area
+                            //     } = value;
+                            //     area[index] = new Option(shop_area, sid);
+                            // })
+                            const {area_rows} = obj
+                            area_rows.map((ele)=>{
+                                const {sid,shop_area} = ele
+                                return(
+                                selArea.innerHTML += `
+                                <option value="${sid}">${shop_area}</option>
+                                `)
+                            })
+                            console.log('456');
+                        })
+                }
+
+            </script>
+            <%- include('./../parts/html-foot') %>
